@@ -1,8 +1,7 @@
 # 🚀 AI Resume & Bio Enhancer
 
 🔗 **Live Demo / GitHub Pages:**  
-👉 https://your-username.github.io/your-repo-name  
-*(Replace this link with your GitHub Pages or deployed app link)*
+👉 https://bigboi-alt.github.io/ai-resume-enhancer/
 
 ---
 
@@ -42,4 +41,5 @@ present themselves better using AI assistance.
 ---
 
 ## 📂 Project Structure
+
 
