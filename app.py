@@ -3,412 +3,436 @@ AI Resume & Bio Enhancer
 A Flask application that uses AI to enhance resumes and bios
 """
 
-from flask import Flask, render_template, request, jsonify
-from openai import OpenAI
 import os
-from dotenv import load_dotenv
+import json
 import re
+from datetime import datetime
+from functools import wraps
+
+from flask import Flask, render_template, request, jsonify, session
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
+# Initialize Flask app
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# ============================================
+# CONFIGURATION
+# ============================================
 
-# Tone-specific prompts
-TONE_PROMPTS = {
-    'professional': """
-        You are an expert resume writer. Enhance the following text to be highly professional.
-        - Use strong action verbs (Led, Developed, Implemented, Achieved, Spearheaded)
-        - Quantify achievements where possible
-        - Keep it concise and impactful
-        - Use industry-standard terminology
-        - Make it sound confident but not arrogant
-        - Format as clear bullet points
-        - Do NOT add fake information or exaggerate
-    """,
-    'casual': """
-        You are a friendly resume helper. Make the following text sound approachable yet impressive.
-        - Keep the tone warm and personable
-        - Use conversational but professional language
-        - Highlight personality alongside skills
-        - Make it relatable and human
-        - Format as clear bullet points
-        - Do NOT add fake information
-    """,
-    'ats-friendly': """
-        You are an ATS (Applicant Tracking System) optimization expert.
-        - Use keywords that ATS systems look for
-        - Keep formatting simple and clean
-        - Use standard section headers
-        - Include relevant industry keywords
-        - Avoid special characters and graphics descriptions
-        - Use common job title variations
-        - Format as clear bullet points
-        - Do NOT add fake information
-    """
-}
+class Config:
+    """Application configuration"""
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+    USE_OPENAI = bool(OPENAI_API_KEY)
+    MAX_INPUT_LENGTH = 5000
+    RATE_LIMIT = 10  # requests per minute
+    
+# ============================================
+# AI ENHANCEMENT ENGINE
+# ============================================
 
-def enhance_text(text: str, tone: str, content_type: str) -> dict:
-    """
-    Enhance resume or bio text using OpenAI API
+class ResumeEnhancer:
+    """AI-powered resume enhancement engine"""
     
-    Args:
-        text: The original text to enhance
-        tone: The desired tone (professional, casual, ats-friendly)
-        content_type: Either 'resume' or 'bio'
-    
-    Returns:
-        Dictionary with enhanced text and bullet points
-    """
-    
-    if not text or not text.strip():
-        return {'error': 'Please provide some text to enhance'}
-    
-    tone_prompt = TONE_PROMPTS.get(tone, TONE_PROMPTS['professional'])
-    
-    if content_type == 'bio':
-        type_instruction = """
-            This is a personal bio/about me section.
-            Create a compelling personal summary that:
-            - Captures the person's essence in 3-5 sentences
-            - Highlights key strengths and passions
-            - Is memorable and engaging
-            Also provide bullet point highlights.
-        """
-    else:
-        type_instruction = """
-            This is resume content.
-            Transform it into powerful bullet points that:
-            - Start with strong action verbs
-            - Show impact and results
-            - Are scannable and clear
-        """
-    
-    full_prompt = f"""
-        {tone_prompt}
-        
-        {type_instruction}
-        
-        Original text:
-        {text}
-        
-        Please provide:
-        1. An enhanced paragraph version (2-4 sentences)
-        2. 4-6 bullet points highlighting key aspects
-        
-        Format your response exactly like this:
-        ENHANCED:
-        [Your enhanced paragraph here]
-        
-        BULLETS:
-        • [Bullet point 1]
-        • [Bullet point 2]
-        • [Bullet point 3]
-        • [Bullet point 4]
-    """
-    
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are an expert resume and professional bio writer. You enhance text while keeping it truthful and authentic."
-                },
-                {
-                    "role": "user",
-                    "content": full_prompt
-                }
-            ],
-            max_tokens=800,
-            temperature=0.7
-        )
-        
-        result = response.choices[0].message.content
-        
-        # Parse the response
-        enhanced = ""
-        bullets = []
-        
-        if "ENHANCED:" in result and "BULLETS:" in result:
-            parts = result.split("BULLETS:")
-            enhanced_part = parts[0].replace("ENHANCED:", "").strip()
-            bullets_part = parts[1].strip()
+    TONE_PROMPTS = {
+        'professional': """
+            You are an expert resume writer and career coach. Enhance the following resume/bio text to be:
+            - Highly professional and polished
+            - Using strong action verbs (Led, Developed, Implemented, Achieved, etc.)
+            - Quantified with metrics where possible
+            - Clear, concise, and impactful
+            - ATS-friendly with relevant keywords
+            - Free of grammatical errors
             
-            enhanced = enhanced_part
+            Format the output as bullet points starting with action verbs.
+            Do NOT add fake information or exaggerate claims.
+            Keep the essence but make it compelling for recruiters.
+        """,
+        
+        'casual': """
+            You are a friendly career advisor. Enhance the following resume/bio text to be:
+            - Warm, approachable, and personable
+            - Engaging and easy to read
+            - Still professional but with personality
+            - Using conversational yet impressive language
+            - Highlighting strengths naturally
             
-            # Extract bullet points
-            bullet_lines = bullets_part.split('\n')
-            for line in bullet_lines:
-                line = line.strip()
-                if line and (line.startswith('•') or line.startswith('-') or line.startswith('*')):
-                    # Clean the bullet point
-                    clean_bullet = re.sub(r'^[•\-\*]\s*', '', line)
-                    if clean_bullet:
-                        bullets.append(clean_bullet)
+            Format the output as bullet points that feel genuine.
+            Do NOT add fake information.
+            Make it sound human and relatable while still impressive.
+        """,
+        
+        'ats': """
+            You are an ATS (Applicant Tracking System) optimization expert. Enhance the following resume/bio text to be:
+            - Heavily keyword-optimized for ATS scanning
+            - Using industry-standard terminology
+            - Including relevant technical skills and buzzwords
+            - Structured for maximum ATS compatibility
+            - Clear and scannable format
+            
+            Format the output as bullet points with strong keywords.
+            Focus on matching common job description language.
+            Do NOT add fake information or skills the person doesn't have.
+        """,
+        
+        'executive': """
+            You are an executive resume writer for C-suite professionals. Enhance the following resume/bio text to be:
+            - Strategic and leadership-focused
+            - Emphasizing vision, impact, and results
+            - Using executive-level language
+            - Highlighting business outcomes and ROI
+            - Demonstrating thought leadership
+            
+            Format the output as powerful bullet points.
+            Focus on strategic impact and leadership qualities.
+            Do NOT add fake information.
+        """,
+        
+        'creative': """
+            You are a creative industry resume specialist. Enhance the following resume/bio text to be:
+            - Creative and unique while professional
+            - Showcasing innovative thinking
+            - Using dynamic, engaging language
+            - Highlighting creative achievements
+            - Standing out from traditional resumes
+            
+            Format the output as compelling bullet points.
+            Make it memorable and distinctive.
+            Do NOT add fake information.
+        """
+    }
+    
+    def __init__(self):
+        """Initialize the enhancer with API client"""
+        self.use_openai = Config.USE_OPENAI
+        
+        if self.use_openai:
+            try:
+                from openai import OpenAI
+                self.client = OpenAI(api_key=Config.OPENAI_API_KEY)
+            except ImportError:
+                print("OpenAI package not installed. Using fallback.")
+                self.use_openai = False
+    
+    def enhance(self, text: str, tone: str = 'professional') -> dict:
+        """
+        Enhance resume/bio text using AI
+        
+        Args:
+            text: The original resume/bio text
+            tone: The desired tone (professional, casual, ats, executive, creative)
+            
+        Returns:
+            dict with success status and enhanced text or error
+        """
+        # Validate input
+        if not text or not text.strip():
+            return {'success': False, 'error': 'Please provide text to enhance'}
+        
+        if len(text) > Config.MAX_INPUT_LENGTH:
+            return {'success': False, 'error': f'Text too long. Maximum {Config.MAX_INPUT_LENGTH} characters.'}
+        
+        # Get tone prompt
+        tone_prompt = self.TONE_PROMPTS.get(tone, self.TONE_PROMPTS['professional'])
+        
+        # Try OpenAI first, then fallback
+        if self.use_openai:
+            return self._enhance_with_openai(text, tone_prompt)
         else:
-            # Fallback parsing
-            enhanced = result
-            bullets = ["Could not parse bullet points. Please try again."]
+            return self._enhance_with_fallback(text, tone)
+    
+    def _enhance_with_openai(self, text: str, system_prompt: str) -> dict:
+        """Enhance using OpenAI API"""
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",  # or "gpt-4" for best results
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Please enhance this resume/bio:\n\n{text}"}
+                ],
+                max_tokens=1500,
+                temperature=0.7
+            )
+            
+            enhanced_text = response.choices[0].message.content
+            return {'success': True, 'enhanced': enhanced_text}
+            
+        except Exception as e:
+            print(f"OpenAI API error: {e}")
+            return self._enhance_with_fallback(text, 'professional')
+    
+    def _enhance_with_fallback(self, text: str, tone: str) -> dict:
+        """Fallback enhancement without API"""
         
-        return {
-            'success': True,
-            'enhanced': enhanced,
-            'bullets': bullets,
-            'tone': tone,
-            'original_length': len(text),
-            'enhanced_length': len(enhanced)
+        # Action verbs for enhancement
+        action_verbs = {
+            'professional': ['Spearheaded', 'Orchestrated', 'Implemented', 'Developed', 'Led', 'Managed', 'Delivered', 'Achieved', 'Streamlined', 'Optimized'],
+            'casual': ['Helped', 'Built', 'Created', 'Worked on', 'Contributed to', 'Collaborated on', 'Improved', 'Designed', 'Launched', 'Grew'],
+            'ats': ['Developed', 'Implemented', 'Managed', 'Analyzed', 'Designed', 'Created', 'Led', 'Coordinated', 'Executed', 'Delivered'],
+            'executive': ['Directed', 'Transformed', 'Pioneered', 'Established', 'Drove', 'Championed', 'Defined', 'Positioned', 'Accelerated', 'Maximized'],
+            'creative': ['Conceptualized', 'Crafted', 'Innovated', 'Reimagined', 'Designed', 'Produced', 'Curated', 'Transformed', 'Envisioned', 'Created']
         }
         
-    except Exception as e:
-        return {
-            'error': f'AI processing error: {str(e)}',
-            'success': False
+        verbs = action_verbs.get(tone, action_verbs['professional'])
+        
+        # Parse sentences
+        sentences = re.split(r'[.!?]+', text)
+        sentences = [s.strip() for s in sentences if s.strip()]
+        
+        enhanced_points = []
+        
+        for i, sentence in enumerate(sentences):
+            # Clean up the sentence
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+            
+            # Remove weak starters
+            weak_starters = [
+                'i am ', 'i have ', 'i did ', 'i was ', 'i worked ',
+                'i helped ', 'i made ', 'i do ', 'i like ', 'i know ',
+                'i learned ', 'i can ', 'i\'m ', 'my '
+            ]
+            
+            lower_sentence = sentence.lower()
+            for starter in weak_starters:
+                if lower_sentence.startswith(starter):
+                    sentence = sentence[len(starter):]
+                    break
+            
+            # Capitalize first letter
+            if sentence:
+                # Add action verb
+                verb = verbs[i % len(verbs)]
+                
+                # Enhance the sentence
+                enhanced = self._enhance_sentence(sentence, verb, tone)
+                enhanced_points.append(enhanced)
+        
+        # If no points, create from original text
+        if not enhanced_points:
+            enhanced_points = [
+                f"{verbs[0]} key initiatives and delivered impactful results",
+                f"{verbs[1]} solutions that addressed critical business needs",
+                f"{verbs[2]} best practices to ensure consistent quality"
+            ]
+        
+        # Format as bullet points
+        result = '\n'.join([f"• {point}" for point in enhanced_points])
+        
+        return {'success': True, 'enhanced': result}
+    
+    def _enhance_sentence(self, sentence: str, verb: str, tone: str) -> str:
+        """Enhance a single sentence"""
+        
+        # Clean and capitalize
+        sentence = sentence.strip().rstrip('.,!?')
+        
+        # Word replacements for enhancement
+        replacements = {
+            'good': 'excellent',
+            'great': 'outstanding',
+            'nice': 'exceptional',
+            'helped': 'contributed to',
+            'made': 'developed',
+            'did': 'executed',
+            'worked on': 'delivered',
+            'some': 'multiple',
+            'a lot': 'extensive',
+            'many': 'numerous',
+            'big': 'significant',
+            'small': 'focused',
+            'stuff': 'initiatives',
+            'things': 'projects',
+            'got': 'achieved',
+            'learned': 'mastered',
+            'know': 'possess expertise in',
+            'like': 'am passionate about',
+            'want': 'am driven to',
+            'try': 'strive to',
+            'use': 'leverage',
+            'make': 'create',
+            'team player': 'collaborative professional',
+            'hard worker': 'dedicated and results-driven',
+            'fast learner': 'quick to adapt and master new concepts',
+            'problem solver': 'analytical thinker with proven problem-solving abilities',
+            'detail oriented': 'meticulous with strong attention to detail',
+            'self starter': 'proactive and self-motivated',
+            'people person': 'skilled communicator with strong interpersonal abilities'
         }
+        
+        # Apply replacements
+        lower_sentence = sentence.lower()
+        for old, new in replacements.items():
+            if old in lower_sentence:
+                # Case-insensitive replacement
+                pattern = re.compile(re.escape(old), re.IGNORECASE)
+                sentence = pattern.sub(new, sentence)
+        
+        # Construct enhanced sentence
+        if sentence[0].isupper():
+            sentence = sentence[0].lower() + sentence[1:]
+        
+        enhanced = f"{verb} {sentence}"
+        
+        # Add impact phrases for professional tone
+        if tone == 'professional' and len(enhanced) < 80:
+            impact_phrases = [
+                ', resulting in improved outcomes',
+                ', driving measurable results',
+                ', enhancing overall performance',
+                ', contributing to team success'
+            ]
+            import random
+            enhanced += random.choice(impact_phrases)
+        
+        return enhanced
 
+# Initialize enhancer
+enhancer = ResumeEnhancer()
 
-def generate_full_resume(data: dict) -> dict:
-    """
-    Generate a complete resume from user data
-    
-    Args:
-        data: Dictionary containing user information
-    
-    Returns:
-        Dictionary with formatted resume sections
-    """
-    
-    name = data.get('name', 'Your Name')
-    email = data.get('email', '')
-    phone = data.get('phone', '')
-    linkedin = data.get('linkedin', '')
-    summary = data.get('summary', '')
-    experience = data.get('experience', '')
-    education = data.get('education', '')
-    skills = data.get('skills', '')
-    tone = data.get('tone', 'professional')
-    
-    prompt = f"""
-        Create a professional resume with the following information.
-        Use a {tone} tone throughout.
-        
-        Name: {name}
-        Email: {email}
-        Phone: {phone}
-        LinkedIn: {linkedin}
-        
-        Summary/About: {summary}
-        
-        Experience: {experience}
-        
-        Education: {education}
-        
-        Skills: {skills}
-        
-        Please create a polished resume with:
-        1. A compelling professional summary (3-4 sentences)
-        2. Experience section with strong bullet points
-        3. Education section properly formatted
-        4. Skills section organized by category if possible
-        
-        Format the response as:
-        
-        SUMMARY:
-        [Professional summary]
-        
-        EXPERIENCE:
-        [Experience with bullet points]
-        
-        EDUCATION:
-        [Education details]
-        
-        SKILLS:
-        [Skills organized]
-        
-        Do NOT fabricate any information. Only enhance what's provided.
-    """
-    
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are an expert resume writer who creates ATS-friendly, impactful resumes. Never add false information."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            max_tokens=1500,
-            temperature=0.7
-        )
-        
-        result = response.choices[0].message.content
-        
-        # Parse sections
-        sections = {
-            'name': name,
-            'email': email,
-            'phone': phone,
-            'linkedin': linkedin,
-            'summary': '',
-            'experience': '',
-            'education': '',
-            'skills': ''
-        }
-        
-        # Simple parsing
-        current_section = None
-        lines = result.split('\n')
-        
-        for line in lines:
-            line_upper = line.upper().strip()
-            if 'SUMMARY:' in line_upper:
-                current_section = 'summary'
-            elif 'EXPERIENCE:' in line_upper:
-                current_section = 'experience'
-            elif 'EDUCATION:' in line_upper:
-                current_section = 'education'
-            elif 'SKILLS:' in line_upper:
-                current_section = 'skills'
-            elif current_section:
-                sections[current_section] += line + '\n'
-        
-        # Clean up sections
-        for key in ['summary', 'experience', 'education', 'skills']:
-            sections[key] = sections[key].strip()
-        
-        return {
-            'success': True,
-            'resume': sections
-        }
-        
-    except Exception as e:
-        return {
-            'error': f'Resume generation error: {str(e)}',
-            'success': False
-        }
-
-
-# ============ ROUTES ============
+# ============================================
+# ROUTES
+# ============================================
 
 @app.route('/')
 def index():
     """Render the main page"""
     return render_template('index.html')
 
-
 @app.route('/enhance', methods=['POST'])
-def enhance():
-    """API endpoint to enhance text"""
-    data = request.get_json()
-    
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
-    
-    text = data.get('text', '')
-    tone = data.get('tone', 'professional')
-    content_type = data.get('type', 'resume')
-    
-    result = enhance_text(text, tone, content_type)
-    
-    if 'error' in result:
-        return jsonify(result), 400
-    
-    return jsonify(result)
+def enhance_resume():
+    """API endpoint to enhance resume text"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'})
+        
+        text = data.get('text', '').strip()
+        tone = data.get('tone', 'professional')
+        
+        # Validate tone
+        valid_tones = ['professional', 'casual', 'ats', 'executive', 'creative']
+        if tone not in valid_tones:
+            tone = 'professional'
+        
+        # Enhance the text
+        result = enhancer.enhance(text, tone)
+        
+        # Log the request (for analytics)
+        log_enhancement(text, tone, result.get('success', False))
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"Error in enhance_resume: {e}")
+        return jsonify({'success': False, 'error': 'An error occurred. Please try again.'})
 
+@app.route('/api/tones')
+def get_tones():
+    """Get available tones"""
+    tones = [
+        {'id': 'professional', 'name': 'Professional', 'description': 'Formal, corporate-ready language', 'icon': '💼'},
+        {'id': 'casual', 'name': 'Casual', 'description': 'Friendly, approachable tone', 'icon': '😊'},
+        {'id': 'ats', 'name': 'ATS-Friendly', 'description': 'Optimized for applicant tracking systems', 'icon': '🤖'},
+        {'id': 'executive', 'name': 'Executive', 'description': 'Strategic, leadership-focused', 'icon': '👔'},
+        {'id': 'creative', 'name': 'Creative', 'description': 'Unique and innovative style', 'icon': '🎨'}
+    ]
+    return jsonify({'success': True, 'tones': tones})
 
-@app.route('/generate-resume', methods=['POST'])
-def generate_resume():
-    """API endpoint to generate full resume"""
-    data = request.get_json()
-    
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
-    
-    result = generate_full_resume(data)
-    
-    if 'error' in result:
-        return jsonify(result), 400
-    
-    return jsonify(result)
-
+@app.route('/api/examples')
+def get_examples():
+    """Get example templates"""
+    examples = [
+        {
+            'id': 1,
+            'title': 'Software Developer',
+            'text': 'I am a developer who knows Python and JavaScript. I made some websites and apps. I like coding and solving problems. I worked on team projects and learned a lot.'
+        },
+        {
+            'id': 2,
+            'title': 'Marketing Professional',
+            'text': 'I work in marketing and handle social media. I create content and manage campaigns. I have experience with different platforms and tools. I helped increase followers.'
+        },
+        {
+            'id': 3,
+            'title': 'Recent Graduate',
+            'text': 'I just graduated with a degree in business. I did some internships and group projects. I am a hard worker and learn fast. I want to grow in my career.'
+        },
+        {
+            'id': 4,
+            'title': 'Career Changer',
+            'text': 'I am switching from teaching to tech. I learned programming online and made some projects. I have good communication skills from teaching. I am excited about this change.'
+        },
+        {
+            'id': 5,
+            'title': 'Project Manager',
+            'text': 'I manage projects and coordinate teams. I make sure things get done on time. I communicate with stakeholders and solve problems. I have experience with agile methods.'
+        }
+    ]
+    return jsonify({'success': True, 'examples': examples})
 
 @app.route('/health')
-def health():
+def health_check():
     """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
-        'service': 'AI Resume Enhancer',
-        'version': '1.0.0'
+        'timestamp': datetime.now().isoformat(),
+        'openai_configured': Config.USE_OPENAI
     })
 
+# ============================================
+# HELPER FUNCTIONS
+# ============================================
 
-# ============ DEMO MODE (No API Key Required) ============
-
-@app.route('/demo-enhance', methods=['POST'])
-def demo_enhance():
-    """Demo endpoint that works without API key"""
-    data = request.get_json()
-    
-    text = data.get('text', '')
-    tone = data.get('tone', 'professional')
-    
-    # Simulated enhancement for demo
-    demo_responses = {
-        'professional': {
-            'enhanced': f"Dedicated professional with demonstrated expertise in key areas. Proven track record of delivering results and driving innovation. Committed to continuous learning and excellence in all endeavors.",
-            'bullets': [
-                "Demonstrated strong technical proficiency and problem-solving capabilities",
-                "Proven ability to deliver high-quality results in fast-paced environments",
-                "Excellent communication and collaboration skills across diverse teams",
-                "Committed to continuous professional development and learning",
-                "Track record of innovative thinking and creative solutions"
-            ]
-        },
-        'casual': {
-            'enhanced': f"Hey there! I'm someone who's genuinely passionate about what I do. I love tackling challenges and creating things that make a real difference. Always eager to learn and grow!",
-            'bullets': [
-                "Passionate about creating meaningful solutions",
-                "Love collaborating with awesome teams",
-                "Always curious and eager to learn new things",
-                "Enjoy turning complex problems into simple solutions",
-                "Bring positive energy and creativity to every project"
-            ]
-        },
-        'ats-friendly': {
-            'enhanced': f"Results-driven professional with experience in software development, project management, and team collaboration. Skilled in multiple programming languages and development methodologies. Strong analytical and problem-solving abilities.",
-            'bullets': [
-                "Proficient in software development and programming",
-                "Experience with agile methodologies and project management",
-                "Strong analytical and problem-solving skills",
-                "Excellent written and verbal communication abilities",
-                "Team collaboration and cross-functional coordination"
-            ]
-        }
-    }
-    
-    response = demo_responses.get(tone, demo_responses['professional'])
-    
-    return jsonify({
-        'success': True,
-        'enhanced': response['enhanced'],
-        'bullets': response['bullets'],
+def log_enhancement(text: str, tone: str, success: bool):
+    """Log enhancement requests for analytics"""
+    log_entry = {
+        'timestamp': datetime.now().isoformat(),
+        'text_length': len(text),
         'tone': tone,
-        'demo': True
-    })
+        'success': success
+    }
+    # In production, you'd save this to a database
+    print(f"Enhancement log: {log_entry}")
 
+# ============================================
+# ERROR HANDLERS
+# ============================================
+
+@app.errorhandler(404)
+def not_found(error):
+    """Handle 404 errors"""
+    return jsonify({'success': False, 'error': 'Endpoint not found'}), 404
+
+@app.errorhandler(500)
+def server_error(error):
+    """Handle 500 errors"""
+    return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.errorhandler(429)
+def rate_limit_error(error):
+    """Handle rate limit errors"""
+    return jsonify({'success': False, 'error': 'Too many requests. Please wait a moment.'}), 429
+
+# ============================================
+# MAIN
+# ============================================
 
 if __name__ == '__main__':
-    # Check for API key
-    if not os.getenv('OPENAI_API_KEY'):
-        print("\n⚠️  WARNING: OPENAI_API_KEY not found!")
-        print("📝 Demo mode available at /demo-enhance")
-        print("🔑 Add your API key to .env file for full functionality\n")
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('FLASK_ENV') == 'development'
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print(f"""
+    ╔═══════════════════════════════════════════╗
+    ║     AI Resume & Bio Enhancer              ║
+    ║     Running on http://localhost:{port}       ║
+    ║     OpenAI: {'Enabled' if Config.USE_OPENAI else 'Disabled (using fallback)'}            ║
+    ╚═══════════════════════════════════════════╝
+    """)
+    
+    app.run(host='0.0.0.0', port=port, debug=debug)

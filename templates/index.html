@@ -3,549 +3,530 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Resume Enhancer ✨</title>
+    <meta name="description" content="AI-powered resume and bio enhancer. Transform your resume into a professional masterpiece.">
+    <meta name="keywords" content="resume, CV, bio, AI, enhancer, career, job">
+    <meta name="author" content="AI Resume Enhancer">
+    
+    <title>AI Resume & Bio Enhancer ✨</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Floating Background Elements -->
-    <div class="floating-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
-        <div class="shape shape-4"></div>
-        <div class="shape shape-5"></div>
-    </div>
-
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Background Elements -->
+    <div class="bg-gradient"></div>
+    <div class="bg-pattern"></div>
+    
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">
+            <a href="/" class="nav-logo">
                 <span class="logo-icon">✨</span>
                 <span class="logo-text">ResumeAI</span>
             </a>
-            <div class="nav-links">
-                <a href="#enhancer" class="nav-link">Enhancer</a>
-                <a href="#builder" class="nav-link">Resume Builder</a>
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#how-it-works" class="nav-link">How It Works</a>
-            </div>
-            <button class="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
+            
+            <ul class="nav-links">
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li><a href="#enhancer" class="nav-link">Enhance Now</a></li>
+            </ul>
+            
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
         </div>
     </nav>
-
+    
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge animate-on-scroll">
-                <span class="badge-icon">🚀</span>
-                <span>AI-Powered Resume Enhancement</span>
-            </div>
-            <h1 class="hero-title animate-on-scroll">
-                Transform Your Resume
-                <span class="gradient-text">Into a Masterpiece</span>
-            </h1>
-            <p class="hero-subtitle animate-on-scroll">
-                Let AI craft the perfect resume that gets you noticed. 
-                Professional, ATS-friendly, and uniquely you.
-            </p>
-            <div class="hero-buttons animate-on-scroll">
-                <a href="#enhancer" class="btn btn-primary">
-                    <span>Start Enhancing</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-                <a href="#how-it-works" class="btn btn-secondary">
-                    <span>See How It Works</span>
-                </a>
-            </div>
-            <div class="hero-stats animate-on-scroll">
-                <div class="stat">
-                    <span class="stat-number" data-count="10000">0</span>
-                    <span class="stat-label">Resumes Enhanced</span>
+    <header class="hero">
+        <div class="hero-container">
+            <div class="hero-content animate-on-scroll">
+                <div class="hero-badge">
+                    <span class="badge-icon">🚀</span>
+                    <span class="badge-text">AI-Powered Resume Enhancement</span>
                 </div>
-                <div class="stat-divider"></div>
-                <div class="stat">
-                    <span class="stat-number" data-count="95">0</span>
-                    <span class="stat-label">% Success Rate</span>
+                
+                <h1 class="hero-title">
+                    Transform Your Resume Into a 
+                    <span class="highlight">Professional Masterpiece</span>
+                </h1>
+                
+                <p class="hero-description">
+                    Paste your resume or bio, select your preferred tone, and let our AI 
+                    create polished, recruiter-ready content in seconds. No fake claims, 
+                    just better writing.
+                </p>
+                
+                <div class="hero-cta">
+                    <a href="#enhancer" class="btn btn-primary magnetic-btn">
+                        <span class="btn-icon">✨</span>
+                        <span>Start Enhancing</span>
+                    </a>
+                    <a href="#how-it-works" class="btn btn-secondary">
+                        <span>See How It Works</span>
+                        <span class="btn-arrow">→</span>
+                    </a>
                 </div>
-                <div class="stat-divider"></div>
-                <div class="stat">
-                    <span class="stat-number" data-count="3">0</span>
-                    <span class="stat-label">Tone Options</span>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number counter" data-target="10000">0</span>
+                        <span class="stat-label">Resumes Enhanced</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number counter" data-target="95">0</span>
+                        <span class="stat-suffix">%</span>
+                        <span class="stat-label">User Satisfaction</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">5</span>
+                        <span class="stat-label">Tone Options</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-visual animate-on-scroll">
+                <div class="visual-card">
+                    <div class="card-before">
+                        <div class="card-label">Before</div>
+                        <p>"I am a developer who knows Python and made some projects. I like coding."</p>
+                    </div>
+                    <div class="card-arrow">
+                        <span>✨</span>
+                    </div>
+                    <div class="card-after">
+                        <div class="card-label">After</div>
+                        <ul>
+                            <li>Proficient Python developer with hands-on project experience</li>
+                            <li>Passionate about creating efficient, scalable solutions</li>
+                            <li>Demonstrated ability to deliver quality code</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="hero-visual animate-on-scroll">
-            <div class="resume-preview">
-                <div class="preview-header">
-                    <div class="preview-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                    <span class="preview-title">Enhanced Resume</span>
-                </div>
-                <div class="preview-content">
-                    <div class="preview-line title"></div>
-                    <div class="preview-line subtitle"></div>
-                    <div class="preview-section">
-                        <div class="preview-line"></div>
-                        <div class="preview-line short"></div>
-                    </div>
-                    <div class="preview-section">
-                        <div class="preview-line"></div>
-                        <div class="preview-line"></div>
-                        <div class="preview-line short"></div>
-                    </div>
-                    <div class="sparkle sparkle-1">✨</div>
-                    <div class="sparkle sparkle-2">⭐</div>
-                    <div class="sparkle sparkle-3">💫</div>
-                </div>
-            </div>
+        
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="currentColor"/>
+            </svg>
         </div>
-    </section>
-
+    </header>
+    
     <!-- Features Section -->
     <section id="features" class="features-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-tag">Features</span>
-                <h2 class="section-title">Why Choose ResumeAI?</h2>
-                <p class="section-subtitle">Powerful features designed to make your resume stand out</p>
+                <span class="section-badge">Features</span>
+                <h2 class="section-title">Why Choose Our AI Enhancer?</h2>
+                <p class="section-description">
+                    Powerful features designed to make your resume stand out from the crowd
+                </p>
             </div>
+            
             <div class="features-grid">
                 <div class="feature-card animate-on-scroll" data-delay="0">
                     <div class="feature-icon">
-                        <i class="fas fa-magic"></i>
+                        <span>🎯</span>
                     </div>
-                    <h3>AI Enhancement</h3>
-                    <p>Advanced AI transforms your text into powerful, impactful statements</p>
+                    <h3 class="feature-title">Multiple Tones</h3>
+                    <p class="feature-description">
+                        Choose from Professional, Casual, ATS-Friendly, Executive, or Creative tones 
+                        to match your target role perfectly.
+                    </p>
                 </div>
-                <div class="feature-card animate-on-scroll" data-delay="100">
+                
+                <div class="feature-card animate-on-scroll" data-delay="1">
                     <div class="feature-icon">
-                        <i class="fas fa-sliders-h"></i>
+                        <span>⚡</span>
                     </div>
-                    <h3>Multiple Tones</h3>
-                    <p>Choose from Professional, Casual, or ATS-Friendly styles</p>
+                    <h3 class="feature-title">Action Verbs</h3>
+                    <p class="feature-description">
+                        Transform passive language into powerful action verbs that grab 
+                        recruiters' attention instantly.
+                    </p>
                 </div>
-                <div class="feature-card animate-on-scroll" data-delay="200">
+                
+                <div class="feature-card animate-on-scroll" data-delay="2">
                     <div class="feature-icon">
-                        <i class="fas fa-robot"></i>
+                        <span>📝</span>
                     </div>
-                    <h3>ATS Optimized</h3>
-                    <p>Beat applicant tracking systems with keyword optimization</p>
+                    <h3 class="feature-title">Clean Bullet Points</h3>
+                    <p class="feature-description">
+                        Get perfectly structured, easy-to-scan bullet points that highlight 
+                        your achievements effectively.
+                    </p>
                 </div>
-                <div class="feature-card animate-on-scroll" data-delay="300">
+                
+                <div class="feature-card animate-on-scroll" data-delay="3">
                     <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
+                        <span>🤖</span>
                     </div>
-                    <h3>Instant Results</h3>
-                    <p>Get your enhanced resume in seconds, not hours</p>
+                    <h3 class="feature-title">ATS Optimized</h3>
+                    <p class="feature-description">
+                        Beat applicant tracking systems with keyword-optimized content that 
+                        gets your resume seen by humans.
+                    </p>
                 </div>
-                <div class="feature-card animate-on-scroll" data-delay="400">
+                
+                <div class="feature-card animate-on-scroll" data-delay="4">
                     <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
+                        <span>✅</span>
                     </div>
-                    <h3>100% Authentic</h3>
-                    <p>We enhance, never fabricate. Your truth, elevated</p>
+                    <h3 class="feature-title">No Fake Claims</h3>
+                    <p class="feature-description">
+                        We enhance your actual experience - no fabricated achievements or 
+                        exaggerated claims. Just better writing.
+                    </p>
                 </div>
-                <div class="feature-card animate-on-scroll" data-delay="500">
+                
+                <div class="feature-card animate-on-scroll" data-delay="5">
                     <div class="feature-icon">
-                        <i class="fas fa-copy"></i>
+                        <span>🔒</span>
                     </div>
-                    <h3>Easy Copy</h3>
-                    <p>One-click copy to use in any application</p>
+                    <h3 class="feature-title">Privacy First</h3>
+                    <p class="feature-description">
+                        Your data is never stored or shared. Everything is processed 
+                        securely and deleted after enhancement.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Enhancer Section -->
-    <section id="enhancer" class="enhancer-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-tag">✨ Magic Happens Here</span>
-                <h2 class="section-title">Enhance Your Resume</h2>
-                <p class="section-subtitle">Paste your text and watch it transform</p>
-            </div>
-            
-            <div class="enhancer-container animate-on-scroll">
-                <!-- Mode Toggle -->
-                <div class="mode-toggle">
-                    <button class="mode-btn active" data-mode="quick">
-                        <i class="fas fa-bolt"></i>
-                        <span>Quick Enhance</span>
-                    </button>
-                    <button class="mode-btn" data-mode="full">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Full Resume</span>
-                    </button>
-                </div>
-
-                <!-- Quick Enhance Mode -->
-                <div id="quick-mode" class="enhance-mode active">
-                    <div class="enhance-grid">
-                        <!-- Input Panel -->
-                        <div class="panel input-panel">
-                            <div class="panel-header">
-                                <h3><i class="fas fa-edit"></i> Your Text</h3>
-                                <div class="content-type-toggle">
-                                    <button class="type-btn active" data-type="resume">Resume</button>
-                                    <button class="type-btn" data-type="bio">Bio</button>
-                                </div>
-                            </div>
-                            <textarea 
-                                id="input-text" 
-                                class="text-input"
-                                placeholder="Paste your resume text or bio here...
-
-Example: I am a student who likes programming and AI and made some projects. I know Python and JavaScript and have worked on web development."></textarea>
-                            <div class="char-count">
-                                <span id="char-count">0</span> / 2000 characters
-                            </div>
-                            
-                            <!-- Tone Selection -->
-                            <div class="tone-selector">
-                                <label class="tone-label">Select Tone:</label>
-                                <div class="tone-options">
-                                    <button class="tone-btn active" data-tone="professional">
-                                        <i class="fas fa-briefcase"></i>
-                                        <span>Professional</span>
-                                    </button>
-                                    <button class="tone-btn" data-tone="casual">
-                                        <i class="fas fa-smile"></i>
-                                        <span>Casual</span>
-                                    </button>
-                                    <button class="tone-btn" data-tone="ats-friendly">
-                                        <i class="fas fa-robot"></i>
-                                        <span>ATS-Friendly</span>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <button id="enhance-btn" class="btn btn-primary btn-large">
-                                <span class="btn-text">
-                                    <i class="fas fa-magic"></i>
-                                    Enhance Now
-                                </span>
-                                <span class="btn-loading">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    Enhancing...
-                                </span>
-                            </button>
-                        </div>
-                        
-                        <!-- Output Panel -->
-                        <div class="panel output-panel">
-                            <div class="panel-header">
-                                <h3><i class="fas fa-star"></i> Enhanced Result</h3>
-                                <div class="output-actions">
-                                    <button class="action-btn" id="copy-all" title="Copy All">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                    <button class="action-btn" id="download-btn" title="Download">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div id="output-content" class="output-content">
-                                <div class="empty-state">
-                                    <div class="empty-icon">✨</div>
-                                    <h4>Your enhanced text will appear here</h4>
-                                    <p>Paste your resume or bio and click "Enhance Now"</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Full Resume Mode -->
-                <div id="full-mode" class="enhance-mode">
-                    <form id="resume-form" class="resume-form">
-                        <div class="form-grid">
-                            <!-- Personal Info -->
-                            <div class="form-section animate-on-scroll">
-                                <h3 class="form-section-title">
-                                    <i class="fas fa-user"></i>
-                                    Personal Information
-                                </h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="name">Full Name</label>
-                                        <input type="text" id="name" placeholder="John Doe" class="form-input">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="email">Email</label>
-                                        <input type="email" id="email" placeholder="john@example.com" class="form-input">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="phone">Phone</label>
-                                        <input type="tel" id="phone" placeholder="+1 234 567 8900" class="form-input">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="linkedin">LinkedIn URL</label>
-                                        <input type="url" id="linkedin" placeholder="linkedin.com/in/johndoe" class="form-input">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Summary -->
-                            <div class="form-section animate-on-scroll">
-                                <h3 class="form-section-title">
-                                    <i class="fas fa-quote-left"></i>
-                                    Professional Summary
-                                </h3>
-                                <div class="form-group">
-                                    <textarea id="summary" placeholder="Write a brief summary about yourself, your goals, and what you bring to the table..." class="form-textarea"></textarea>
-                                </div>
-                            </div>
-                            
-                            <!-- Experience -->
-                            <div class="form-section animate-on-scroll">
-                                <h3 class="form-section-title">
-                                    <i class="fas fa-briefcase"></i>
-                                    Work Experience
-                                </h3>
-                                <div class="form-group">
-                                    <textarea id="experience" placeholder="Describe your work experience. Include job titles, companies, dates, and key responsibilities/achievements..." class="form-textarea tall"></textarea>
-                                </div>
-                            </div>
-                            
-                            <!-- Education -->
-                            <div class="form-section animate-on-scroll">
-                                <h3 class="form-section-title">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    Education
-                                </h3>
-                                <div class="form-group">
-                                    <textarea id="education" placeholder="List your education: degrees, institutions, graduation dates, relevant coursework..." class="form-textarea"></textarea>
-                                </div>
-                            </div>
-                            
-                            <!-- Skills -->
-                            <div class="form-section animate-on-scroll">
-                                <h3 class="form-section-title">
-                                    <i class="fas fa-tools"></i>
-                                    Skills
-                                </h3>
-                                <div class="form-group">
-                                    <textarea id="skills" placeholder="List your skills: programming languages, tools, soft skills, certifications..." class="form-textarea"></textarea>
-                                </div>
-                            </div>
-                            
-                            <!-- Tone Selection for Full Resume -->
-                            <div class="form-section tone-section animate-on-scroll">
-                                <h3 class="form-section-title">
-                                    <i class="fas fa-palette"></i>
-                                    Select Tone
-                                </h3>
-                                <div class="tone-options full-width">
-                                    <button type="button" class="tone-btn active" data-tone="professional">
-                                        <i class="fas fa-briefcase"></i>
-                                        <span>Professional</span>
-                                    </button>
-                                    <button type="button" class="tone-btn" data-tone="casual">
-                                        <i class="fas fa-smile"></i>
-                                        <span>Casual</span>
-                                    </button>
-                                    <button type="button" class="tone-btn" data-tone="ats-friendly">
-                                        <i class="fas fa-robot"></i>
-                                        <span>ATS-Friendly</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" id="generate-btn" class="btn btn-primary btn-large btn-full">
-                            <span class="btn-text">
-                                <i class="fas fa-magic"></i>
-                                Generate Full Resume
-                            </span>
-                            <span class="btn-loading">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Generating...
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <!-- Generated Resume Preview -->
-                    <div id="resume-preview" class="resume-preview-full hidden">
-                        <div class="preview-header-bar">
-                            <h3><i class="fas fa-file-alt"></i> Your Generated Resume</h3>
-                            <div class="preview-actions">
-                                <button class="action-btn" id="copy-resume">
-                                    <i class="fas fa-copy"></i> Copy
-                                </button>
-                                <button class="action-btn" id="download-resume">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                                <button class="action-btn" id="edit-resume">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                            </div>
-                        </div>
-                        <div id="resume-content" class="resume-content"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- How It Works Section -->
-    <section id="how-it-works" class="how-section">
+    <section id="how-it-works" class="steps-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-tag">Simple Process</span>
+                <span class="section-badge">Process</span>
                 <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Three simple steps to your perfect resume</p>
+                <p class="section-description">
+                    Three simple steps to transform your resume
+                </p>
             </div>
             
             <div class="steps-container">
-                <div class="step animate-on-scroll" data-delay="0">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <div class="step-icon">
-                            <i class="fas fa-paste"></i>
-                        </div>
-                        <h3>Paste Your Text</h3>
-                        <p>Copy and paste your existing resume content or write a rough draft</p>
-                    </div>
+                <div class="step-card animate-on-scroll">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">📋</div>
+                    <h3 class="step-title">Paste Your Text</h3>
+                    <p class="step-description">
+                        Copy and paste your resume paragraph, bio, or about me section. 
+                        Works with any length of text.
+                    </p>
                 </div>
                 
-                <div class="step-connector animate-on-scroll"></div>
-                
-                <div class="step animate-on-scroll" data-delay="200">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <div class="step-icon">
-                            <i class="fas fa-sliders-h"></i>
-                        </div>
-                        <h3>Choose Your Tone</h3>
-                        <p>Select Professional, Casual, or ATS-Friendly based on your needs</p>
-                    </div>
+                <div class="step-connector">
+                    <div class="connector-line"></div>
+                    <div class="connector-arrow">→</div>
                 </div>
                 
-                <div class="step-connector animate-on-scroll"></div>
+                <div class="step-card animate-on-scroll">
+                    <div class="step-number">02</div>
+                    <div class="step-icon">🎨</div>
+                    <h3 class="step-title">Choose Your Tone</h3>
+                    <p class="step-description">
+                        Select the tone that matches your target role - from formal 
+                        corporate to creative and casual.
+                    </p>
+                </div>
                 
-                <div class="step animate-on-scroll" data-delay="400">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <div class="step-icon">
-                            <i class="fas fa-magic"></i>
+                <div class="step-connector">
+                    <div class="connector-line"></div>
+                    <div class="connector-arrow">→</div>
+                </div>
+                
+                <div class="step-card animate-on-scroll">
+                    <div class="step-number">03</div>
+                    <div class="step-icon">✨</div>
+                    <h3 class="step-title">Get Enhanced Results</h3>
+                    <p class="step-description">
+                        Receive polished, professional bullet points ready to copy 
+                        into your resume or LinkedIn profile.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Main Enhancer Section -->
+    <section id="enhancer" class="enhancer-section">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-badge">Try It Now</span>
+                <h2 class="section-title">Enhance Your Resume</h2>
+                <p class="section-description">
+                    Paste your text below and watch the magic happen
+                </p>
+            </div>
+            
+            <div class="enhancer-container animate-on-scroll">
+                <form id="enhanceForm" class="enhance-form">
+                    <!-- Example Templates -->
+                    <div class="examples-section">
+                        <label class="form-label">
+                            <span class="label-icon">💡</span>
+                            <span>Try an example:</span>
+                        </label>
+                        <div class="example-templates" id="exampleTemplates">
+                            <!-- Populated by JavaScript -->
                         </div>
-                        <h3>Get Enhanced Results</h3>
-                        <p>Receive your polished, professional resume ready to impress</p>
+                    </div>
+                    
+                    <!-- Text Input -->
+                    <div class="form-group">
+                        <label for="resumeText" class="form-label">
+                            <span class="label-icon">📝</span>
+                            <span>Your Resume/Bio Text</span>
+                        </label>
+                        <div class="textarea-wrapper">
+                            <textarea 
+                                id="resumeText" 
+                                name="resumeText" 
+                                class="form-textarea"
+                                placeholder="Paste your resume paragraph, bio, or about me section here...
+
+Example: I am a software developer with 3 years of experience. I know Python, JavaScript, and React. I have worked on various projects including web apps and APIs. I am a team player and quick learner."
+                                rows="8"
+                                required
+                                maxlength="5000"
+                            ></textarea>
+                            <div class="textarea-glow"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tone Selection -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="label-icon">🎯</span>
+                            <span>Select Tone</span>
+                        </label>
+                        <div class="tone-options" id="toneOptions">
+                            <label class="tone-option">
+                                <input type="radio" name="tone" value="professional" checked>
+                                <span class="tone-card">
+                                    <span class="tone-icon">💼</span>
+                                    <span class="tone-name">Professional</span>
+                                    <span class="tone-desc">Formal & Corporate</span>
+                                </span>
+                            </label>
+                            
+                            <label class="tone-option">
+                                <input type="radio" name="tone" value="casual">
+                                <span class="tone-card">
+                                    <span class="tone-icon">😊</span>
+                                    <span class="tone-name">Casual</span>
+                                    <span class="tone-desc">Friendly & Warm</span>
+                                </span>
+                            </label>
+                            
+                            <label class="tone-option">
+                                <input type="radio" name="tone" value="ats">
+                                <span class="tone-card">
+                                    <span class="tone-icon">🤖</span>
+                                    <span class="tone-name">ATS-Friendly</span>
+                                    <span class="tone-desc">Keyword Optimized</span>
+                                </span>
+                            </label>
+                            
+                            <label class="tone-option">
+                                <input type="radio" name="tone" value="executive">
+                                <span class="tone-card">
+                                    <span class="tone-icon">👔</span>
+                                    <span class="tone-name">Executive</span>
+                                    <span class="tone-desc">Leadership Focus</span>
+                                </span>
+                            </label>
+                            
+                            <label class="tone-option">
+                                <input type="radio" name="tone" value="creative">
+                                <span class="tone-card">
+                                    <span class="tone-icon">🎨</span>
+                                    <span class="tone-name">Creative</span>
+                                    <span class="tone-desc">Unique & Bold</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" id="submitBtn" class="submit-btn magnetic-btn">
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-text">Enhance My Resume</span>
+                        <span class="btn-loader">
+                            <span class="loader-dot"></span>
+                            <span class="loader-dot"></span>
+                            <span class="loader-dot"></span>
+                        </span>
+                    </button>
+                    
+                    <p class="form-hint">
+                        <span>⌨️</span> Pro tip: Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to submit
+                    </p>
+                </form>
+                
+                <!-- Output Section -->
+                <div id="outputSection" class="output-section">
+                    <div id="outputContent" class="output-content">
+                        <!-- Results will be inserted here -->
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
+    
     <!-- Testimonials Section -->
     <section class="testimonials-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-tag">Success Stories</span>
-                <h2 class="section-title">What People Say</h2>
+                <span class="section-badge">Testimonials</span>
+                <h2 class="section-title">What Users Say</h2>
             </div>
             
             <div class="testimonials-grid">
-                <div class="testimonial-card animate-on-scroll" data-delay="0">
+                <div class="testimonial-card animate-on-scroll">
                     <div class="testimonial-content">
-                        <div class="quote-icon">"</div>
-                        <p>This tool completely transformed my resume. Got 3 interview calls within a week!</p>
+                        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                        <p class="testimonial-text">
+                            "This tool transformed my boring resume into something I'm actually proud of. 
+                            Got 3 interview calls in the first week!"
+                        </p>
                     </div>
                     <div class="testimonial-author">
                         <div class="author-avatar">SK</div>
                         <div class="author-info">
-                            <h4>Sarah K.</h4>
-                            <span>Software Developer</span>
+                            <span class="author-name">Sarah K.</span>
+                            <span class="author-role">Software Engineer</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="testimonial-card animate-on-scroll" data-delay="100">
+                <div class="testimonial-card animate-on-scroll">
                     <div class="testimonial-content">
-                        <div class="quote-icon">"</div>
-                        <p>The ATS-friendly mode helped me finally get past those automated screening systems.</p>
+                        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                        <p class="testimonial-text">
+                            "The ATS-friendly option is a game changer. My resume finally gets past 
+                            those automated filters. Highly recommend!"
+                        </p>
                     </div>
                     <div class="testimonial-author">
                         <div class="author-avatar">MJ</div>
                         <div class="author-info">
-                            <h4>Mike J.</h4>
-                            <span>Marketing Manager</span>
+                            <span class="author-name">Mike J.</span>
+                            <span class="author-role">Marketing Manager</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="testimonial-card animate-on-scroll" data-delay="200">
+                <div class="testimonial-card animate-on-scroll">
                     <div class="testimonial-content">
-                        <div class="quote-icon">"</div>
-                        <p>Simple, fast, and effective. Exactly what I needed for my job search.</p>
+                        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                        <p class="testimonial-text">
+                            "As a recent grad, I had no idea how to write a professional resume. 
+                            This tool made it so easy. Love it!"
+                        </p>
                     </div>
                     <div class="testimonial-author">
                         <div class="author-avatar">AL</div>
                         <div class="author-info">
-                            <h4>Amy L.</h4>
-                            <span>Recent Graduate</span>
+                            <span class="author-name">Alex L.</span>
+                            <span class="author-role">Recent Graduate</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
+    
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="container">
             <div class="cta-content animate-on-scroll">
-                <h2>Ready to Land Your Dream Job?</h2>
-                <p>Join thousands who've already transformed their resumes</p>
-                <a href="#enhancer" class="btn btn-primary btn-large">
-                    <i class="fas fa-rocket"></i>
-                    Start Now - It's Free
+                <h2 class="cta-title">Ready to Transform Your Resume?</h2>
+                <p class="cta-description">
+                    Join thousands of job seekers who've already upgraded their resumes with AI
+                </p>
+                <a href="#enhancer" class="btn btn-primary btn-large magnetic-btn">
+                    <span class="btn-icon">🚀</span>
+                    <span>Get Started Free</span>
                 </a>
             </div>
         </div>
     </section>
-
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <span class="logo">✨ ResumeAI</span>
-                    <p>Elevating careers with AI-powered resume enhancement</p>
+                    <a href="/" class="footer-logo">
+                        <span class="logo-icon">✨</span>
+                        <span class="logo-text">ResumeAI</span>
+                    </a>
+                    <p class="footer-tagline">
+                        AI-powered resume enhancement for modern job seekers.
+                    </p>
                 </div>
+                
                 <div class="footer-links">
-                    <a href="#features">Features</a>
-                    <a href="#enhancer">Enhancer</a>
-                    <a href="#how-it-works">How It Works</a>
-                </div>
-                <div class="footer-social">
-                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <ul>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#how-it-works">How It Works</a></li>
+                            <li><a href="#enhancer">Try Now</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="#">Resume Tips</a></li>
+                            <li><a href="#">Career Blog</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <ul>
+                            <li><a href="#">GitHub</a></li>
+                            <li><a href="#">Twitter</a></li>
+                            <li><a href="#">LinkedIn</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+            
             <div class="footer-bottom">
-                <p>&copy; 2024 ResumeAI. Made with ❤️ for job seekers everywhere.</p>
+                <p class="copyright">
+                    © 2024 ResumeAI. Made with ☕ and ❤️
+                </p>
+                <div class="footer-badges">
+                    <span class="badge">🔒 Privacy First</span>
+                    <span class="badge">⚡ AI Powered</span>
+                    <span class="badge">💯 Free to Use</span>
+                </div>
             </div>
         </div>
     </footer>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <i class="toast-icon fas fa-check-circle"></i>
-        <span class="toast-message">Copied to clipboard!</span>
-    </div>
-
+    
+    <!-- Scripts -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
